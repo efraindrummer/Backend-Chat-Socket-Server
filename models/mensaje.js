@@ -21,7 +21,7 @@ const MensajeSchema = Schema({
 
 }, {
     //con esta funcion se le asiganara la fecha de creacion y ultima modificacion
-    timestamos: true
+    timestamps: true
 });
 
 //serializacion para extraer la desestructuracion de las variables del objeto
