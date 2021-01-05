@@ -1,5 +1,5 @@
 const { comprobarJWT } = require("../helpers/jwt");
-const { usuarioConectado, usuarioDesconectado } = require('../controllers/sockets');
+const { usuarioConectado, usuarioDesconectado, getUsuarios } = require('../controllers/sockets');
 
 class Sockets {
 
@@ -22,18 +22,23 @@ class Sockets {
             }
             
             await usuarioConectado(uid);
+
+            //unir al usuario a una sala de socket.io
+            socket.join(uid);
+            //validar el jwt
             //console.log('se conecto: ', usuario.nombre);
+
+            //escuchar cuando el cliente manda un mensaje
+            socket.on('mensaje-personal', (payload) => {
+                console.log(payload);
+            })
             
-            //validar el jwt en el instancte y si es valido continua
-            //si el token no es valido se tendra que desconectar
-            //todo el usuario tiene que saber que esta activo y se tiene ue hacer hace mediante el uid
-            //emitir todos los usarios conectados
-            //socket join - para unirse a una sala especifica con el mismo uid
-            //escuchar cuando el cliente manda un mensaje - Mensaje personal
-            //disconnect para marcar en la base de datos que es usuario se desconecto
-            //emitir todos los usaurios conectados jejejeje, disfrutar trabajando JAJAJAJ  (:
+            //emitir todos lo usuarios conectados
+            this.io.emit('lista-usuarios', await getUsuarios())
+
             socket.on('disconnect', async() => {
                 await usuarioDesconectado(uid);
+                this.io.emit('lista-usuarios', await getUsuarios());
             })
         });
     }
